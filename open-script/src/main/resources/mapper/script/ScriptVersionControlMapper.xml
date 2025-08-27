@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.script.mapper.ScriptVersionControlMapper">
+
+	<resultMap type="ScriptVersionControl" id="ScriptVersionControlResult">
+		<id     property="id"            column="id"           />
+		<result property="gameId"        column="game_id"      />
+		<result property="fileUrl"       column="file_url"     />
+		<result property="type"          column="type"         />
+		<result property="version"       column="version"      />
+		<result property="delFlag"       column="del_flag"     />
+		<result property="createDept"    column="create_dept"  />
+		<result property="createBy"      column="create_by"    />
+		<result property="createTime"    column="create_time"  />
+		<result property="updateBy"      column="update_by"    />
+		<result property="updateTime"    column="update_time"  />
+		<result property="remark"        column="remark"       />
+		<result property="gameTitle"     column="game_title"   />
+	</resultMap>
+	
+	<sql id="selectScriptVersionControlVo">
+        select vc.id, vc.game_id, vc.file_url, vc.type, vc.version, vc.del_flag, vc.create_dept, vc.create_by, vc.create_time, vc.update_by, vc.update_time, vc.remark, g.title as game_title
+		from script_version_control vc
+		left join script_game g on vc.game_id = g.id
+    </sql>
+	
+	<select id="selectScriptVersionControlList" parameterType="ScriptVersionControl" resultMap="ScriptVersionControlResult">
+	    <include refid="selectScriptVersionControlVo"/>
+		<where>
+		    vc.del_flag = '0'
+			<if test="gameId != null">
+				AND vc.game_id = #{gameId}
+			</if>
+			<if test="type != null">
+				AND vc.type = #{type}
+			</if>
+			<if test="version != null">
+				AND vc.version = #{version}
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(vc.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(vc.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+		</where>
+		order by vc.game_id, vc.version desc
+	</select>
+	
+	<select id="selectScriptVersionControlAll" resultMap="ScriptVersionControlResult">
+		<include refid="selectScriptVersionControlVo"/>
+		where vc.del_flag = '0'
+		order by vc.game_id, vc.version desc
+	</select>
+	
+	<select id="selectScriptVersionControlById" parameterType="Long" resultMap="ScriptVersionControlResult">
+		<include refid="selectScriptVersionControlVo"/>
+		where vc.id = #{id}
+	</select>
+	
+	<select id="selectScriptVersionControlByGameId" parameterType="Long" resultMap="ScriptVersionControlResult">
+		<include refid="selectScriptVersionControlVo"/>
+		where vc.game_id = #{gameId} and vc.del_flag = '0'
+		order by vc.version desc
+	</select>
+	
+	<select id="selectMaxVersionByGameId" parameterType="Long" resultType="Integer">
+		select max(version) from script_version_control
+		where game_id = #{gameId} and del_flag = '0'
+	</select>
+	
+	<select id="selectLatestVersionByGameId" resultMap="ScriptVersionControlResult">
+		<include refid="selectScriptVersionControlVo"/>
+		where vc.game_id = #{gameId} and vc.version = #{version} and vc.del_flag = '0'
+		limit 1
+	</select>
+	
+	<update id="updateScriptVersionControl" parameterType="ScriptVersionControl">
+ 		update script_version_control
+ 		<set>
+ 			<if test="gameId != null">game_id = #{gameId},</if>
+ 			<if test="fileUrl != null and fileUrl != ''">file_url = #{fileUrl},</if>
+ 			<if test="type != null">type = #{type},</if>
+ 			<if test="version != null">version = #{version},</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+ 			<if test="remark != null">remark = #{remark},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where id = #{id}
+	</update>
+ 	
+ 	<insert id="insertScriptVersionControl" parameterType="ScriptVersionControl" useGeneratedKeys="true" keyProperty="id">
+ 		insert into script_version_control(
+ 			<if test="id != null and id != 0">id,</if>
+ 			<if test="gameId != null">game_id,</if>
+ 			<if test="fileUrl != null and fileUrl != ''">file_url,</if>
+ 			<if test="type != null">type,</if>
+ 			<if test="version != null">version,</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag,</if>
+ 			<if test="createDept != null">create_dept,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			create_time
+ 		)values(
+ 			<if test="id != null and id != 0">#{id},</if>
+ 			<if test="gameId != null">#{gameId},</if>
+ 			<if test="fileUrl != null and fileUrl != ''">#{fileUrl},</if>
+ 			<if test="type != null">#{type},</if>
+ 			<if test="version != null">#{version},</if>
+ 			<if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+ 			<if test="createDept != null">#{createDept},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			sysdate()
+ 		)
+	</insert>
+	
+	<update id="deleteScriptVersionControlById" parameterType="Long">
+		update script_version_control set del_flag = '1' where id = #{id}
+	</update>
+	
+	<update id="deleteScriptVersionControlByIds" parameterType="Long">
+ 		update script_version_control set del_flag = '1' where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</update>
+
+</mapper>

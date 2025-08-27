@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.script.mapper.ScriptCardDeviceMapper">
+
+	<resultMap type="ScriptCardDevice" id="ScriptCardDeviceResult">
+		<id     property="id"                column="id"                 />
+		<result property="cardNo"            column="card_no"            />
+		<result property="deviceAndroidId"   column="device_android_id"  />
+		<result property="delFlag"           column="del_flag"           />
+		<result property="createDept"        column="create_dept"        />
+		<result property="createBy"          column="create_by"          />
+		<result property="createTime"        column="create_time"        />
+		<result property="updateBy"          column="update_by"          />
+		<result property="updateTime"        column="update_time"        />
+		<result property="remark"            column="remark"             />
+		<association property="deviceInfo"   column="device_android_id"  javaType="ScriptDevice" resultMap="deviceResult" />
+	</resultMap>
+	
+	<resultMap type="ScriptDevice" id="deviceResult">
+		<id     property="id"                column="device_id"          />
+		<result property="deviceAndroidId"   column="device_android_id"  />
+		<result property="deviceWidth"       column="device_width"       />
+		<result property="deviceHeight"      column="device_height"      />
+		<result property="deviceBuildId"     column="device_build_id"    />
+		<result property="deviceBroad"       column="device_broad"       />
+		<result property="deviceBrand"       column="device_brand"       />
+		<result property="deviceName"        column="device_name"        />
+		<result property="deviceModel"       column="device_model"       />
+		<result property="deviceSdkInt"      column="device_sdk_int"     />
+		<result property="deviceIMEI"        column="device_IMEI"        />
+	</resultMap>
+	
+	<sql id="selectScriptCardDeviceVo">
+        select cd.id, cd.card_no, cd.device_android_id, cd.del_flag, cd.create_dept, cd.create_by, cd.create_time, cd.update_by, cd.update_time, cd.remark,
+               d.id as device_id, d.device_width, d.device_height, d.device_build_id, d.device_broad, d.device_brand, d.device_name, d.device_model, d.device_sdk_int, d.device_IMEI
+		from script_card_device cd
+		left join script_device d on cd.device_android_id = d.device_android_id and d.del_flag = '0'
+    </sql>
+	
+	<select id="selectScriptCardDeviceList" parameterType="ScriptCardDevice" resultMap="ScriptCardDeviceResult">
+	    <include refid="selectScriptCardDeviceVo"/>
+		<where>
+		    cd.del_flag = '0'
+			<if test="cardNo != null and cardNo != ''">
+				AND cd.card_no = #{cardNo}
+			</if>
+			<if test="deviceAndroidId != null and deviceAndroidId != ''">
+				AND cd.device_android_id = #{deviceAndroidId}
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(cd.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(cd.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+		</where>
+		order by cd.create_time desc
+	</select>
+	
+	<select id="selectScriptCardDeviceAll" resultMap="ScriptCardDeviceResult">
+		<include refid="selectScriptCardDeviceVo"/>
+		where cd.del_flag = '0'
+		order by cd.create_time desc
+	</select>
+	
+	<select id="selectScriptCardDeviceById" parameterType="Long" resultMap="ScriptCardDeviceResult">
+		<include refid="selectScriptCardDeviceVo"/>
+		where cd.id = #{id}
+	</select>
+	
+	<select id="selectScriptCardDeviceByCardNo" parameterType="String" resultMap="ScriptCardDeviceResult">
+		<include refid="selectScriptCardDeviceVo"/>
+		where cd.card_no = #{cardNo} and cd.del_flag = '0'
+		order by cd.create_time desc
+	</select>
+	
+	<select id="selectScriptCardDeviceByAndroidId" parameterType="String" resultMap="ScriptCardDeviceResult">
+		<include refid="selectScriptCardDeviceVo"/>
+		where cd.device_android_id = #{deviceAndroidId} and cd.del_flag = '0'
+		order by cd.create_time desc
+	</select>
+	
+	<select id="selectScriptCardDeviceByCardNoAndAndroidId" resultMap="ScriptCardDeviceResult">
+		<include refid="selectScriptCardDeviceVo"/>
+		where cd.card_no = #{cardNo} and cd.device_android_id = #{deviceAndroidId} and cd.del_flag = '0'
+	</select>
+	
+	<select id="countDevicesByCardNo" parameterType="String" resultType="int">
+		select count(*) from script_card_device
+		where card_no = #{cardNo} and del_flag = '0'
+	</select>
+	
+	<update id="updateScriptCardDevice" parameterType="ScriptCardDevice">
+ 		update script_card_device
+ 		<set>
+ 			<if test="cardNo != null and cardNo != ''">card_no = #{cardNo},</if>
+ 			<if test="deviceAndroidId != null and deviceAndroidId != ''">device_android_id = #{deviceAndroidId},</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+ 			<if test="remark != null">remark = #{remark},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where id = #{id}
+	</update>
+ 	
+ 	<insert id="insertScriptCardDevice" parameterType="ScriptCardDevice" useGeneratedKeys="true" keyProperty="id">
+ 		insert into script_card_device(
+ 			<if test="id != null and id != 0">id,</if>
+ 			<if test="cardNo != null and cardNo != ''">card_no,</if>
+ 			<if test="deviceAndroidId != null and deviceAndroidId != ''">device_android_id,</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag,</if>
+ 			<if test="createDept != null">create_dept,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			create_time
+ 		)values(
+ 			<if test="id != null and id != 0">#{id},</if>
+ 			<if test="cardNo != null and cardNo != ''">#{cardNo},</if>
+ 			<if test="deviceAndroidId != null and deviceAndroidId != ''">#{deviceAndroidId},</if>
+ 			<if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+ 			<if test="createDept != null">#{createDept},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			sysdate()
+ 		)
+	</insert>
+	
+	<update id="deleteScriptCardDeviceById" parameterType="Long">
+		update script_card_device set del_flag = '1' where id = #{id}
+	</update>
+	
+	<update id="deleteScriptCardDeviceByIds" parameterType="Long">
+ 		update script_card_device set del_flag = '1' where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</update>
+ 	
+ 	<update id="deleteScriptCardDeviceByCardNo" parameterType="String">
+		update script_card_device set del_flag = '1' where card_no = #{cardNo}
+	</update>
+
+</mapper>

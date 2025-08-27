@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.script.mapper.ScriptLogMapper">
+
+	<resultMap type="ScriptLog" id="ScriptLogResult">
+		<id     property="id"            column="id"           />
+		<result property="androidId"     column="android_id"   />
+		<result property="level"         column="level"        />
+		<result property="tag"           column="tag"          />
+		<result property="message"       column="message"      />
+		<result property="extra"         column="extra"        />
+		<result property="delFlag"       column="del_flag"     />
+		<result property="createDept"    column="create_dept"  />
+		<result property="createBy"      column="create_by"    />
+		<result property="createTime"    column="create_time"  />
+		<result property="updateBy"      column="update_by"    />
+		<result property="updateTime"    column="update_time"  />
+		<result property="remark"        column="remark"       />
+	</resultMap>
+	
+	<sql id="selectScriptLogVo">
+        select id, android_id, level, tag, message, extra, del_flag, create_dept, create_by, create_time, update_by, update_time, remark
+		from script_log
+    </sql>
+	
+	<select id="selectScriptLogList" parameterType="ScriptLog" resultMap="ScriptLogResult">
+	    <include refid="selectScriptLogVo"/>
+		<where>
+		    del_flag = '0'
+			<if test="androidId != null and androidId != ''">
+				AND android_id = #{androidId}
+			</if>
+			<if test="level != null and level != ''">
+				AND level = #{level}
+			</if>
+			<if test="tag != null and tag != ''">
+				AND tag like concat('%', #{tag}, '%')
+			</if>
+			<if test="message != null and message != ''">
+				AND message like concat('%', #{message}, '%')
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+		</where>
+		order by create_time desc
+	</select>
+	
+	<select id="selectScriptLogAll" resultMap="ScriptLogResult">
+		<include refid="selectScriptLogVo"/>
+		where del_flag = '0'
+		order by create_time desc
+	</select>
+	
+	<select id="selectScriptLogById" parameterType="Long" resultMap="ScriptLogResult">
+		<include refid="selectScriptLogVo"/>
+		where id = #{id}
+	</select>
+	
+	<select id="selectScriptLogByAndroidId" parameterType="String" resultMap="ScriptLogResult">
+		<include refid="selectScriptLogVo"/>
+		where android_id = #{androidId} and del_flag = '0'
+		order by create_time desc
+	</select>
+	
+	<select id="selectScriptLogByLevel" parameterType="String" resultMap="ScriptLogResult">
+		<include refid="selectScriptLogVo"/>
+		where level = #{level} and del_flag = '0'
+		order by create_time desc
+	</select>
+	
+	<update id="updateScriptLog" parameterType="ScriptLog">
+ 		update script_log
+ 		<set>
+ 			<if test="androidId != null and androidId != ''">android_id = #{androidId},</if>
+ 			<if test="level != null and level != ''">level = #{level},</if>
+ 			<if test="tag != null and tag != ''">tag = #{tag},</if>
+ 			<if test="message != null and message != ''">message = #{message},</if>
+ 			<if test="extra != null and extra != ''">extra = #{extra},</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+ 			<if test="remark != null">remark = #{remark},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where id = #{id}
+	</update>
+ 	
+ 	<insert id="insertScriptLog" parameterType="ScriptLog" useGeneratedKeys="true" keyProperty="id">
+ 		insert into script_log(
+ 			<if test="id != null and id != 0">id,</if>
+ 			<if test="androidId != null and androidId != ''">android_id,</if>
+ 			<if test="level != null and level != ''">level,</if>
+ 			<if test="tag != null and tag != ''">tag,</if>
+ 			<if test="message != null and message != ''">message,</if>
+ 			<if test="extra != null and extra != ''">extra,</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag,</if>
+ 			<if test="createDept != null">create_dept,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			create_time
+ 		)values(
+ 			<if test="id != null and id != 0">#{id},</if>
+ 			<if test="androidId != null and androidId != ''">#{androidId},</if>
+ 			<if test="level != null and level != ''">#{level},</if>
+ 			<if test="tag != null and tag != ''">#{tag},</if>
+ 			<if test="message != null and message != ''">#{message},</if>
+ 			<if test="extra != null and extra != ''">#{extra},</if>
+ 			<if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+ 			<if test="createDept != null">#{createDept},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			sysdate()
+ 		)
+	</insert>
+	
+	<update id="deleteScriptLogById" parameterType="Long">
+		update script_log set del_flag = '1' where id = #{id}
+	</update>
+	
+	<update id="deleteScriptLogByIds" parameterType="Long">
+ 		update script_log set del_flag = '1' where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</update>
+ 	
+ 	<update id="deleteScriptLogByAndroidId" parameterType="String">
+		update script_log set del_flag = '1' where android_id = #{androidId}
+	</update>
+	
+	<update id="deleteScriptLogBeforeDate" parameterType="String">
+		update script_log set del_flag = '1' 
+		where create_time &lt; #{beforeDate}
+	</update>
+
+</mapper>

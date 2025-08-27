@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.script.mapper.ScriptCardGameMapper">
+
+	<resultMap type="ScriptCardGame" id="ScriptCardGameResult">
+		<id     property="id"            column="id"           />
+		<result property="cardNo"        column="card_no"      />
+		<result property="gameId"        column="game_id"      />
+		<result property="createDept"    column="create_dept"  />
+		<result property="createBy"      column="create_by"    />
+		<result property="createTime"    column="create_time"  />
+		<result property="updateBy"      column="update_by"    />
+		<result property="updateTime"    column="update_time"  />
+		<result property="remark"        column="remark"       />
+		<result property="gameTitle"     column="game_title"   />
+	</resultMap>
+	
+	<sql id="selectScriptCardGameVo">
+        select cg.id, cg.card_no, cg.game_id, cg.create_dept, cg.create_by, cg.create_time, cg.update_by, cg.update_time, cg.remark, g.title as game_title
+		from script_card_game cg
+		left join script_game g on cg.game_id = g.id
+    </sql>
+	
+	<select id="selectScriptCardGameList" parameterType="ScriptCardGame" resultMap="ScriptCardGameResult">
+	    <include refid="selectScriptCardGameVo"/>
+		<where>
+			<if test="cardNo != null and cardNo != ''">
+				AND cg.card_no = #{cardNo}
+			</if>
+			<if test="gameId != null">
+				AND cg.game_id = #{gameId}
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(cg.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(cg.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+		</where>
+		order by cg.create_time desc
+	</select>
+	
+	<select id="selectGamesByCardNo" parameterType="String" resultMap="ScriptCardGameResult">
+		<include refid="selectScriptCardGameVo"/>
+		where cg.card_no = #{cardNo}
+		order by cg.create_time desc
+	</select>
+	
+	<select id="selectCardsByGameId" parameterType="Long" resultMap="ScriptCardGameResult">
+		<include refid="selectScriptCardGameVo"/>
+		where cg.game_id = #{gameId}
+		order by cg.create_time desc
+	</select>
+	
+	<select id="selectScriptCardGameById" parameterType="Long" resultMap="ScriptCardGameResult">
+		<include refid="selectScriptCardGameVo"/>
+		where cg.id = #{id}
+	</select>
+	
+	<update id="updateScriptCardGame" parameterType="ScriptCardGame">
+ 		update script_card_game
+ 		<set>
+ 			<if test="cardNo != null and cardNo != ''">card_no = #{cardNo},</if>
+ 			<if test="gameId != null">game_id = #{gameId},</if>
+ 			<if test="remark != null">remark = #{remark},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where id = #{id}
+	</update>
+ 	
+ 	<insert id="insertScriptCardGame" parameterType="ScriptCardGame" useGeneratedKeys="true" keyProperty="id">
+ 		insert into script_card_game(
+ 			<if test="id != null and id != 0">id,</if>
+ 			<if test="cardNo != null and cardNo != ''">card_no,</if>
+ 			<if test="gameId != null">game_id,</if>
+ 			<if test="createDept != null">create_dept,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			create_time
+ 		)values(
+ 			<if test="id != null and id != 0">#{id},</if>
+ 			<if test="cardNo != null and cardNo != ''">#{cardNo},</if>
+ 			<if test="gameId != null">#{gameId},</if>
+ 			<if test="createDept != null">#{createDept},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			sysdate()
+ 		)
+	</insert>
+	
+	<insert id="batchInsertScriptCardGame" parameterType="java.util.List">
+		insert into script_card_game(card_no, game_id, create_dept, create_by, create_time, remark)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.cardNo}, #{item.gameId}, #{item.createDept}, #{item.createBy}, sysdate(), #{item.remark})
+		</foreach>
+	</insert>
+	
+	<delete id="deleteScriptCardGameById" parameterType="Long">
+		delete from script_card_game where id = #{id}
+	</delete>
+	
+	<delete id="deleteScriptCardGameByIds" parameterType="Long">
+ 		delete from script_card_game where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</delete>
+	
+	<delete id="deleteScriptCardGameByCardNo" parameterType="String">
+		delete from script_card_game where card_no = #{cardNo}
+	</delete>
+	
+	<delete id="deleteScriptCardGameByGameId" parameterType="Long">
+		delete from script_card_game where game_id = #{gameId}
+	</delete>
+
+</mapper>

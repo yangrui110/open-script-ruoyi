@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.script.mapper.ScriptDeviceMapper">
+
+	<resultMap type="ScriptDevice" id="ScriptDeviceResult">
+		<id     property="id"                column="id"                 />
+		<result property="deviceAndroidId"   column="device_android_id"  />
+		<result property="deviceWidth"       column="device_width"       />
+		<result property="deviceHeight"      column="device_height"      />
+		<result property="deviceBuildId"     column="device_build_id"    />
+		<result property="deviceBroad"       column="device_broad"       />
+		<result property="deviceBrand"       column="device_brand"       />
+		<result property="deviceName"        column="device_name"        />
+		<result property="deviceModel"       column="device_model"       />
+		<result property="deviceSdkInt"      column="device_sdk_int"     />
+		<result property="deviceIMEI"        column="device_IMEI"        />
+		<result property="delFlag"           column="del_flag"           />
+		<result property="createDept"        column="create_dept"        />
+		<result property="createBy"          column="create_by"          />
+		<result property="createTime"        column="create_time"        />
+		<result property="updateBy"          column="update_by"          />
+		<result property="updateTime"        column="update_time"        />
+		<result property="remark"            column="remark"             />
+	</resultMap>
+	
+	<sql id="selectScriptDeviceVo">
+        select id, device_android_id, device_width, device_height, device_build_id, device_broad, device_brand, device_name, device_model, device_sdk_int, device_IMEI, del_flag, create_dept, create_by, create_time, update_by, update_time, remark
+		from script_device
+    </sql>
+	
+	<select id="selectScriptDeviceList" parameterType="ScriptDevice" resultMap="ScriptDeviceResult">
+	    <include refid="selectScriptDeviceVo"/>
+		<where>
+		    del_flag = '0'
+			<if test="deviceAndroidId != null and deviceAndroidId != ''">
+				AND device_android_id = #{deviceAndroidId}
+			</if>
+			<if test="deviceBrand != null and deviceBrand != ''">
+				AND device_brand like concat('%', #{deviceBrand}, '%')
+			</if>
+			<if test="deviceModel != null and deviceModel != ''">
+				AND device_model like concat('%', #{deviceModel}, '%')
+			</if>
+			<if test="deviceName != null and deviceName != ''">
+				AND device_name like concat('%', #{deviceName}, '%')
+			</if>
+			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+				AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+			</if>
+			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+				AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+			</if>
+		</where>
+		order by create_time desc
+	</select>
+	
+	<select id="selectScriptDeviceAll" resultMap="ScriptDeviceResult">
+		<include refid="selectScriptDeviceVo"/>
+		where del_flag = '0'
+		order by create_time desc
+	</select>
+	
+	<select id="selectScriptDeviceById" parameterType="Long" resultMap="ScriptDeviceResult">
+		<include refid="selectScriptDeviceVo"/>
+		where id = #{id}
+	</select>
+	
+	<select id="selectScriptDeviceByAndroidId" parameterType="String" resultMap="ScriptDeviceResult">
+		<include refid="selectScriptDeviceVo"/>
+		where device_android_id = #{deviceAndroidId} and del_flag = '0'
+	</select>
+	
+	<update id="updateScriptDevice" parameterType="ScriptDevice">
+ 		update script_device
+ 		<set>
+ 			<if test="deviceAndroidId != null and deviceAndroidId != ''">device_android_id = #{deviceAndroidId},</if>
+ 			<if test="deviceWidth != null">device_width = #{deviceWidth},</if>
+ 			<if test="deviceHeight != null">device_height = #{deviceHeight},</if>
+ 			<if test="deviceBuildId != null">device_build_id = #{deviceBuildId},</if>
+ 			<if test="deviceBroad != null">device_broad = #{deviceBroad},</if>
+ 			<if test="deviceBrand != null">device_brand = #{deviceBrand},</if>
+ 			<if test="deviceName != null">device_name = #{deviceName},</if>
+ 			<if test="deviceModel != null">device_model = #{deviceModel},</if>
+ 			<if test="deviceSdkInt != null">device_sdk_int = #{deviceSdkInt},</if>
+ 			<if test="deviceIMEI != null">device_IMEI = #{deviceIMEI},</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+ 			<if test="remark != null">remark = #{remark},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where id = #{id}
+	</update>
+ 	
+ 	<insert id="insertScriptDevice" parameterType="ScriptDevice" useGeneratedKeys="true" keyProperty="id">
+ 		insert into script_device(
+ 			<if test="id != null and id != 0">id,</if>
+ 			<if test="deviceAndroidId != null and deviceAndroidId != ''">device_android_id,</if>
+ 			<if test="deviceWidth != null">device_width,</if>
+ 			<if test="deviceHeight != null">device_height,</if>
+ 			<if test="deviceBuildId != null and deviceBuildId != ''">device_build_id,</if>
+ 			<if test="deviceBroad != null and deviceBroad != ''">device_broad,</if>
+ 			<if test="deviceBrand != null and deviceBrand != ''">device_brand,</if>
+ 			<if test="deviceName != null and deviceName != ''">device_name,</if>
+ 			<if test="deviceModel != null and deviceModel != ''">device_model,</if>
+ 			<if test="deviceSdkInt != null and deviceSdkInt != ''">device_sdk_int,</if>
+ 			<if test="deviceIMEI != null and deviceIMEI != ''">device_IMEI,</if>
+ 			<if test="delFlag != null and delFlag != ''">del_flag,</if>
+ 			<if test="createDept != null">create_dept,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			create_time
+ 		)values(
+ 			<if test="id != null and id != 0">#{id},</if>
+ 			<if test="deviceAndroidId != null and deviceAndroidId != ''">#{deviceAndroidId},</if>
+ 			<if test="deviceWidth != null">#{deviceWidth},</if>
+ 			<if test="deviceHeight != null">#{deviceHeight},</if>
+ 			<if test="deviceBuildId != null and deviceBuildId != ''">#{deviceBuildId},</if>
+ 			<if test="deviceBroad != null and deviceBroad != ''">#{deviceBroad},</if>
+ 			<if test="deviceBrand != null and deviceBrand != ''">#{deviceBrand},</if>
+ 			<if test="deviceName != null and deviceName != ''">#{deviceName},</if>
+ 			<if test="deviceModel != null and deviceModel != ''">#{deviceModel},</if>
+ 			<if test="deviceSdkInt != null and deviceSdkInt != ''">#{deviceSdkInt},</if>
+ 			<if test="deviceIMEI != null and deviceIMEI != ''">#{deviceIMEI},</if>
+ 			<if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+ 			<if test="createDept != null">#{createDept},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			sysdate()
+ 		)
+	</insert>
+	
+	<update id="deleteScriptDeviceById" parameterType="Long">
+		update script_device set del_flag = '1' where id = #{id}
+	</update>
+	
+	<update id="deleteScriptDeviceByIds" parameterType="Long">
+ 		update script_device set del_flag = '1' where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</update>
+
+</mapper>
