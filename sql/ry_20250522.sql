@@ -259,6 +259,12 @@ insert into sys_menu values('1057', '生成删除', '116', '3', '#', '', '', '',
 insert into sys_menu values('1058', '导入代码', '116', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:import',            '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1059', '预览代码', '116', '5', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:preview',           '#', 'admin', sysdate(), '', null, '');
 insert into sys_menu values('1060', '生成代码', '116', '6', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:code',              '#', 'admin', sysdate(), '', null, '');
+--- 脚本管理
+INSERT INTO sys_menu VALUES('2000', '开源脚本', '0', '0', 'openscript', NULL, NULL, '', 1, 0, 'M', '0', '0', NULL, 'cascader', 'admin', '2025-08-27 12:17:21', '', NULL, '');
+INSERT INTO sys_menu VALUES(2001, '卡密管理', 2000, 1, 'card', 'script/card/index', NULL, '', 1, 0, 'C', '0', '0', NULL, 'cascader', 'admin', '2025-08-27 12:17:55', '', NULL, '');
+INSERT INTO sys_menu VALUES(2002, '游戏管理', 2000, 2, 'game', 'script/game/index', NULL, '', 1, 0, 'C', '0', '0', NULL, 'date-range', 'admin', '2025-08-27 12:37:15', '', NULL, '');
+INSERT INTO sys_menu VALUES(2003, '版本管理', 2000, 3, 'version', 'script/version/index', NULL, '', 1, 0, 'C', '0', '0', NULL, 'documentation', 'admin', '2025-08-27 13:14:04', '', NULL, '');
+INSERT INTO sys_menu VALUES(2004, '日志管理', 2000, 4, 'log', 'script/log/index', NULL, '', 1, 0, 'C', '0', '0', NULL, 'education', 'admin', '2025-08-27 13:45:08', '', NULL, '');
 
 
 -- ----------------------------
