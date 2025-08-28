@@ -10,7 +10,7 @@
 
 AutoJS脚本管理框架是一套完整的脚本管理解决方案，包含**AutoJS6客户端**、**若依后台管理系统**和**Spring Boot后端API**。系统支持卡密认证、脚本版本管理、设备管理、日志收集等功能，为AutoJS脚本的商业化运营提供完整的技术支撑。
 
-## 🏗️ 系统架构
+## 🏗️ 系统架构726703994
 
 ```
 open-script-ruoyi/
@@ -27,6 +27,7 @@ open-script-ruoyi/
 ## ✨ 核心功能
 
 ### 🎯 AutoJS客户端功能
+
 - **卡密登录认证** - 支持卡密验证和设备绑定
 - **游戏脚本管理** - 动态加载和运行不同游戏脚本
 - **版本自动更新** - 自动检测和下载最新脚本版本
@@ -35,6 +36,7 @@ open-script-ruoyi/
 - **权限自动检测** - 智能检测和申请必要的系统权限
 
 ### 🎮 后台管理功能
+
 - **卡密管理** - 卡密生成、分配、状态管理
 - **游戏管理** - 游戏信息维护和脚本关联
 - **版本控制** - 脚本版本发布和历史管理
@@ -45,11 +47,13 @@ open-script-ruoyi/
 ## 🚀 技术栈
 
 ### 前端技术
+
 - **Vue 2.x** - 渐进式JavaScript框架
 - **Element UI** - Vue组件库
 - **Axios** - HTTP客户端
 
 ### 后端技术
+
 - **Spring Boot 2.x** - 微服务框架
 - **Spring Security** - 安全框架
 - **MyBatis** - 持久层框架
@@ -57,19 +61,22 @@ open-script-ruoyi/
 - **Redis** - 缓存数据库
 
 ### 客户端技术
+
 - **AutoJS6** - Android自动化脚本引擎
 - **JavaScript ES6+** - 脚本开发语言
 
 ## 📦 快速开始
 
 ### 环境要求
-- **JDK 8+** 
+
+- **JDK 8+**
 - **MySQL 5.7+**
 - **Redis 3.2+**
 - **Node.js 14+**
 - **AutoJS6** (Android端)
 
 ### 1. 数据库初始化
+
 ```bash
 # 导入基础数据库
 mysql -u root -p < sql/ry_20250522.sql
@@ -79,6 +86,7 @@ mysql -u root -p < sql/script_card.sql
 ```
 
 ### 2. 后端部署
+
 ```bash
 # 修改数据库配置
 # 编辑 ruoyi-admin/src/main/resources/application-druid.yml
@@ -91,6 +99,7 @@ java -jar ruoyi-admin/target/ruoyi-admin.jar
 ```
 
 ### 3. 前端部署
+
 ```bash
 cd ruoyi-ui
 
@@ -105,6 +114,7 @@ npm run build:prod
 ```
 
 ### 4. AutoJS客户端配置
+
 ```javascript
 // 修改 autojs-script/modules/config.js 中的服务器地址
 let API_CONFIG = {
@@ -118,22 +128,26 @@ let API_CONFIG = {
 ### 核心模块
 
 #### 🔧 配置管理 (`modules/config.js`)
+
 - **API配置** - 服务器地址和接口端点
 - **日志配置** - 本地存储和远程上传设置
 - **应用配置** - 基础应用信息和存储键名
 
 #### 🌐 HTTP工具 (`modules/http-utils.js`)
+
 - **请求封装** - GET/POST请求统一处理
 - **认证管理** - Token自动添加和刷新
 - **错误处理** - 网络异常和业务异常处理
 
 #### 📝 日志系统 (`modules/logger.js` & `modules/logger-integration.js`)
+
 - **多级日志** - DEBUG/INFO/WARN/ERROR级别
 - **本地存储** - 自动文件分割和清理
 - **远程上传** - 批量上传到服务器
 - **环境适配** - 开发/生产环境不同配置
 
 #### 🎮 主应用 (`main.js`)
+
 - **用户界面** - Material Design风格界面
 - **登录认证** - 卡密验证和设备绑定
 - **脚本管理** - 游戏选择和脚本运行
@@ -142,13 +156,15 @@ let API_CONFIG = {
 ### 界面预览
 
 #### 登录界面
+
 - 卡密输入和验证
-![输入图片说明](doc/Screenshot_20250828-152828.png)
+  ![输入图片说明](doc/Screenshot_20250828-152828.png)
 - 记住登录状态
 - 设备信息显示
-![输入图片说明](doc/Screenshot_20250828-152959.png)
+  ![输入图片说明](doc/Screenshot_20250828-152959.png)
 
 #### 主界面
+
 - 游戏列表展示
 - 脚本运行控制
 - 日志实时显示
@@ -159,13 +175,15 @@ let API_CONFIG = {
 ### 脚本管理模块 (`open-script`)
 
 #### 📋 核心实体
+
 - **ScriptCard** - 卡密信息管理
-- **ScriptGame** - 游戏信息管理  
+- **ScriptGame** - 游戏信息管理
 - **ScriptVersionControl** - 版本控制管理
 - **ScriptDevice** - 设备信息管理
 - **ScriptLog** - 日志信息管理
 
 #### 🔌 主要API接口
+
 ```java
 // 登录认证
 POST /open-api/script/login
@@ -188,32 +206,38 @@ POST /open-api/script/logs/upload
 ### 脚本管理模块
 
 #### 🎯 卡密管理 (`ruoyi-ui/src/views/script/card/`)
+
 - 卡密生成和批量操作
 - 状态管理和过期控制
 - 设备绑定查看
 
 #### 🎮 游戏管理 (`ruoyi-ui/src/views/script/game/`)
+
 - 游戏信息维护
 - 脚本关联配置
 
 #### 📦 版本管理 (`ruoyi-ui/src/views/script/version/`)
+
 - 版本发布和历史
 - 文件上传和下载
 - 版本回滚功能
 
 #### 📱 设备管理
+
 - 设备信息查看
 - 在线状态监控
 - 设备绑定管理
 
 #### 📊 日志管理 (`ruoyi-ui/src/views/script/log/`)
+
 - 远程日志查看
 - 日志级别筛选
 - 日志导出功能
-![输入图片说明](doc/1756367169191.jpg)
-![输入图片说明](doc/1756367177843.jpg)
-![输入图片说明](doc/1756367185880.jpg)
-![输入图片说明](doc/1756367197998.jpg)
+  ![输入图片说明](doc/1756367169191.jpg)
+  ![输入图片说明](doc/1756367177843.jpg)
+  ![输入图片说明](doc/1756367185880.jpg)
+  ![输入图片说明](doc/1756367197998.jpg)
+
 ## 🗄️ 数据库设计
 
 ### 核心表结构
@@ -251,16 +275,17 @@ CREATE TABLE script_version_control (
 ### 添加新游戏脚本
 
 1. **后台添加游戏信息**
+
    ```
    系统管理 -> 脚本管理 -> 游戏管理 -> 新增
    ```
-
 2. **上传脚本版本**
+
    ```
    系统管理 -> 脚本管理 -> 版本管理 -> 新增版本
    ```
-
 3. **客户端自动同步**
+
    - 客户端启动时自动获取游戏列表
    - 选择游戏时自动检查版本更新
 
@@ -285,28 +310,29 @@ logger.logNetworkRequest(endpoint, method, statusCode, duration);
 ### 生产环境部署
 
 1. **服务器配置**
+
    - CPU: 2核心以上
    - 内存: 4GB以上
    - 存储: 50GB以上
-
 2. **数据库优化**
+
    ```sql
    -- 创建索引优化查询
    CREATE INDEX idx_card_no ON script_card(card_no);
    CREATE INDEX idx_device_android_id ON script_device(device_android_id);
    CREATE INDEX idx_log_create_time ON script_log(create_time);
    ```
-
 3. **Nginx配置**
+
    ```nginx
    server {
        listen 80;
        server_name your-domain.com;
-       
+
        location /api/ {
            proxy_pass http://127.0.0.1:8080/;
        }
-       
+
        location / {
            root /var/www/ruoyi-ui/dist;
            try_files $uri $uri/ /index.html;
@@ -330,7 +356,7 @@ logger.logNetworkRequest(endpoint, method, statusCode, duration);
 
 - 项目地址：[GitHub Repository]
 - 问题反馈：[Issues]
-- 技术交流：欢迎加入技术交流群
+- 技术交流群：QQ群 726703994
 
 ## 🙏 致谢
 
