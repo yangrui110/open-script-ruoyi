@@ -1,0 +1,30 @@
+{
+    "assets": [],
+    "encryptLevel": 0,
+    "useFeatures": ["ui"],
+    "launchConfig": {
+        "displaySplash": true,
+        "hideLogs": false,
+        "splashText": "AutoJS脚本管理器",
+        "stableMode": false
+    },
+    "main": "main.js",
+    "name": "AutoJS脚本管理器",
+    "optimization": {
+        "removeOpenCv": false,
+        "unusedResources": false
+    },
+    "packageName": "org.autojs.autojs6.script_manager",
+    "scripts": {},
+    "versionCode": 1,
+    "versionName": "1.0.0",
+    "ignore": [
+        "/.internal/",
+        "/build/",
+        "/node_modules/",
+        "/out/",
+        "/declarations/",
+        "/autojs6-dts/",
+        "/README.md"
+    ]
+}

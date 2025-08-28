@@ -1,0 +1,24 @@
+{
+    "name": "autojs-script-manager",
+    "version": "1.0.0",
+    "description": "基于AutoJS6开发的脚本管理工具，支持卡密登录、游戏选择、版本管理等功能",
+    "main": "main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dts": "npm i @sm003/autojs6-dts",
+        "dts-link": "node .internal/create-dts-link.mjs"
+    },
+    "keywords": [
+        "autojs",
+        "autojs6",
+        "script",
+        "manager",
+        "game",
+        "version"
+    ],
+    "author": "AutoJS Script Manager",
+    "license": "MIT",
+    "devDependencies": {
+        "@sm003/autojs6-dts": "^2.0.0"
+    }
+}
