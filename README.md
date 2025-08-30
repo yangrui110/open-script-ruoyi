@@ -10,7 +10,17 @@
 
 AutoJS脚本管理框架是一套完整的脚本管理解决方案，包含**AutoJS6客户端**、**若依后台管理系统**和**Spring Boot后端API**。系统支持卡密认证、脚本版本管理、设备管理、日志收集等功能，为AutoJS脚本的商业化运营提供完整的技术支撑。
 
-## 🏗️ 系统架构726703994
+## 📚 在线文档
+
+<p align="center">
+  <a href="http://doc.sanguoyr.top" target="_blank">
+    <img src="https://img.shields.io/badge/📖_在线文档-访问文档-blue?style=for-the-badge&logo=read-the-docs" alt="在线文档">
+  </a>
+</p>
+
+> 🚀 **完整的使用教程、API文档和常见问题解答请访问：[http://doc.sanguoyr.top](http://doc.sanguoyr.top)**
+
+## 🏗️ 系统架构
 
 ```
 open-script-ruoyi/
