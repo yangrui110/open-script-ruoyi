@@ -1,13 +1,26 @@
 /**
  * 应用配置管理模块
  * 统一管理API配置、日志配置等所有配置项
+ * 
+ * 多租户配置说明：
+ * - TENANT_ID: 租户标识符，用于多租户数据隔离
+ * - 不同的客户端应该配置不同的TENANT_ID值
+ * - 默认值"000000"是系统默认租户，实际部署时请根据业务需要修改
+ * - 租户ID决定了该客户端只能访问对应租户下的卡密数据
  */
 
 // API配置
 let API_CONFIG = {
     // 基础URL，实际部署时请修改为正确的服务器地址
-    BASE_URL: "http://192.168.201.7:8080",
+    BASE_URL: "http://192.168.1.58:8080",
     CLIENT_ID: "f36c69cd4655566bbfac652e479cb931",
+    // 租户ID，用于多租户隔离（写死配置，不同的客户端使用不同的租户ID）
+    // 重要提示：
+    // 1. 每个客户端应该配置唯一的租户ID
+    // 2. 租户ID应与服务端sys_tenant表中的tenant_id字段对应
+    // 3. 修改此配置后，只能访问对应租户下的卡密数据
+    // 4. 常见租户ID格式：6位数字，如：000000（默认）、000001、000002等
+    TENANT_ID: "205493", // 默认租户ID，实际部署时请修改为对应的租户ID
     ENDPOINTS: {
         LOGIN: "/open-api/script/login",
         LOGOUT: "/open-api/script/logout", 
@@ -47,7 +60,7 @@ let LOGGER_CONFIG = {
         // 输出配置
         consoleOutput: true,  // 控制台输出
         fileOutput: true,     // 本地文件存储
-        serverUpload: true,   // 启用服务器上传
+        serverUpload: false,  // 默认禁用服务器上传，需要在登录后手动启用
         
         // 服务器配置
         server: {
@@ -65,7 +78,7 @@ let LOGGER_CONFIG = {
         serverLevel: 1, // 服务器上传INFO及以上级别
         consoleOutput: false, // 生产模式不输出到控制台
         fileOutput: true,
-        serverUpload: true
+        serverUpload: false // 生产环境默认禁用服务器上传，需要在登录后启用
     },
     
     // 开发环境配置
@@ -74,7 +87,7 @@ let LOGGER_CONFIG = {
         serverLevel: 1, // 服务器上传只发送INFO及以上级别（DEBUG不上传）
         consoleOutput: true,
         fileOutput: true,
-        serverUpload: true // 开发环境默认不上传到服务器
+        serverUpload: false // 开发环境默认不上传到服务器，需要在登录后启用
     }
 };
 
@@ -239,6 +252,7 @@ module.exports = {
     // 便捷访问
     get BASE_URL() { return API_CONFIG.BASE_URL; },
     get CLIENT_ID() { return API_CONFIG.CLIENT_ID; },
+    get TENANT_ID() { return API_CONFIG.TENANT_ID; },
     get ENDPOINTS() { return API_CONFIG.ENDPOINTS; },
     get APP_NAME() { return APP_CONFIG.APP_INFO.NAME; },
     get APP_VERSION() { return APP_CONFIG.APP_INFO.VERSION; },

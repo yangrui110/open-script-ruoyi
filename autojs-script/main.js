@@ -10,7 +10,8 @@ let logger = require('./modules/logger-integration.js');
 // 初始化logger配置
 let loggerConfig = config.getLoggerConfig();
 logger.getRawLogger().setConfig('server', loggerConfig.server);
-logger.getRawLogger().setConfig('serverUpload', loggerConfig.serverUpload);
+// 初始时禁用服务器上传，等用户登录后再启用
+logger.getRawLogger().setConfig('serverUpload', false);
 
 // 使用配置文件中的API配置
 let API_CONFIG = config.API_CONFIG;
@@ -77,6 +78,8 @@ let apiUtils = {
             // token过期或无效
             logger.warn("Auth", "认证失败，清除token并跳转到登录页");
             storages.create("auth").remove("cardToken");
+            // 禁用日志上传功能
+            logger.getRawLogger().setConfig('serverUpload', false);
             if (isLoggedIn) {
                 ui.run(() => {
                     performLogout();
@@ -388,12 +391,14 @@ function verifyExistingToken() {
                     userInfo = result.data;
                     userInfo.loginTimeDisplay = new Date().toLocaleString();
                     
+                    // 启用日志上传功能
+                    logger.getRawLogger().setConfig('serverUpload', true);
+                    logger.info("Auth", "自动登录成功，已启用日志上传功能", { cardNo: userInfo.cardNo, remainingDays: userInfo.remainingDays });
+                    
                     ui.run(() => {
                         showLoginSuccess();
                         toast("自动登录成功");
                     });
-                    
-                    logger.info("Auth", "自动登录成功", { cardNo: userInfo.cardNo, remainingDays: userInfo.remainingDays });
                 } else {
                     // token无效，清除
                     logger.warn("Auth", "token已失效，清除保存的token");
@@ -675,6 +680,7 @@ function performLogin() {
         try {
             // 构建登录请求数据，对应CardLoginBo
             let loginData = {
+                tenantId: config.TENANT_ID, // 添加租户ID，用于多租户隔离
                 cardNo: cardNo,
                 deviceAndroidId: deviceId,
                 deviceWidth: deviceInfo.deviceWidth,
@@ -729,6 +735,10 @@ function performLogin() {
                         cardNo: userInfo.cardNo,
                         hasGames: userInfo.games && userInfo.games.length > 0
                     });
+                    
+                    // 启用日志上传功能
+                    logger.getRawLogger().setConfig('serverUpload', true);
+                    logger.info("Auth", "登录成功，已启用日志上传功能");
                     
                     // 切换到主页面
                     ui.run(() => {
@@ -818,6 +828,10 @@ function performLogout() {
         
         // 清除存储的token
         storages.create("auth").remove("cardToken");
+        
+        // 禁用日志上传功能
+        logger.getRawLogger().setConfig('serverUpload', false);
+        logger.info("Auth", "用户退出登录，已禁用日志上传功能");
         
         // 清空输入框
         ui.cardNoInput.setText("");

@@ -385,10 +385,41 @@ function Logger() {
     }
     
     /**
+     * 检查是否有有效的认证token
+     * @returns {boolean} 是否已登录
+     */
+    function hasValidToken() {
+        try {
+            // 使用与httpUtils相同的配置获取token
+            var authStorageName = "auth";
+            var tokenStorageKey = "cardToken";
+            
+            var storage = storages.create(authStorageName);
+            var token = storage.get(tokenStorageKey, "");
+            
+            return token && token.trim().length > 0;
+        } catch (e) {
+            console.warn('[Logger] 检查token状态失败:', e.message);
+            return false;
+        }
+    }
+    
+    /**
      * 上传日志到服务器
      */
     function uploadLogs() {
         if (uploadQueue.length === 0 || !config.server.url) {
+            return;
+        }
+        
+        // 检查是否已登录，未登录时不上传日志
+        if (!hasValidToken()) {
+            // 清空上传队列，避免积累过多日志
+            var droppedCount = uploadQueue.length;
+            uploadQueue = [];
+            if (droppedCount > 0) {
+                debug('Logger', '用户未登录，跳过日志上传，丢弃 ' + droppedCount + ' 条日志');
+            }
             return;
         }
         
@@ -410,6 +441,12 @@ function Logger() {
     function uploadLogsToServer(logs) {
         var retries = 0;
         var success = false;
+        
+        // 在上传前再次检查登录状态
+        if (!hasValidToken()) {
+            warn('Logger', '上传过程中发现用户未登录，取消上传');
+            return;
+        }
         
         while (!success && retries < config.server.maxRetries) {
             try {
@@ -439,6 +476,10 @@ function Logger() {
                     } catch (parseError) {
                         throw new Error('响应解析失败: ' + parseError.message);
                     }
+                } else if (response && response.statusCode === 401) {
+                    // 认证失败，停止重试
+                    error('Logger', '日志上传认证失败，停止重试');
+                    break;
                 } else {
                     throw new Error('HTTP请求失败，状态码: ' + (response ? response.statusCode : '未知'));
                 }
