@@ -3,6 +3,8 @@ package com.ruoyi.web.controller.script;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.validation.Valid;
+
+import com.ruoyi.common.annotation.ApiEncrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
@@ -64,10 +66,12 @@ public class OpenApiController
     @Value("${token.header}")
     private String header;
 
+
     /**
      * 卡密登录接口
      */
     @PostMapping("/login")
+    @ApiEncrypt(response = true)
     public AjaxResult login(@Validated @RequestBody LoginRequest request)
     {
         try
@@ -123,6 +127,7 @@ public class OpenApiController
      * 获取用户信息（需要JWT认证）
      */
     @GetMapping("/userinfo")
+    @ApiEncrypt(response = true)
     public AjaxResult getUserInfo(HttpServletRequest request)
     {
         // 使用标准TokenService获取用户信息
@@ -149,6 +154,7 @@ public class OpenApiController
      * 登出接口
      */
     @PostMapping("/logout")
+    @ApiEncrypt(response = true)
     public AjaxResult logout(HttpServletRequest request)
     {
         // 使用标准TokenService进行登出
@@ -165,6 +171,7 @@ public class OpenApiController
      * 验证token接口
      */
     @PostMapping("/verify")
+    @ApiEncrypt(response = true)
     public AjaxResult verifyToken(@RequestHeader(value = "Authorization", required = false) String authorization,
                                  @RequestHeader(value = "Card-Token", required = false) String cardTokenHeader,
                                  HttpServletRequest request)
@@ -264,6 +271,7 @@ public class OpenApiController
      * 获取卡密信息接口
      */
     @GetMapping("/card-info")
+    @ApiEncrypt(response = true)
     public AjaxResult getCardInfo()
     {
         // 从当前上下文获取token
@@ -287,6 +295,7 @@ public class OpenApiController
      * 演示如何在业务接口中使用卡密认证
      */
     @GetMapping("/game-data/{gameId}")
+    @ApiEncrypt(response = true)
     public AjaxResult getGameData(@PathVariable Long gameId, HttpServletRequest request)
     {
         // 使用标准TokenService获取用户信息
@@ -326,6 +335,7 @@ public class OpenApiController
      * 获取指定游戏的最新版本
      */
     @GetMapping("/latest/{gameId}")
+    @ApiEncrypt(response = true)
     public AjaxResult getLatestVersion(@PathVariable Long gameId, HttpServletRequest request)
     {
         // 使用标准TokenService获取用户信息（需要认证）
@@ -371,6 +381,7 @@ public class OpenApiController
      * 用于AutoJS脚本上传执行日志
      */
     @PostMapping("/logs/upload")
+    @ApiEncrypt(response = true)
     public AjaxResult uploadLogs(@Valid @RequestBody LogBatchDto logBatchDto, HttpServletRequest request)
     {
         try

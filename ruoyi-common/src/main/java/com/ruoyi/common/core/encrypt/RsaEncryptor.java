@@ -1,0 +1,56 @@
+package com.ruoyi.common.core.encrypt;
+
+import com.ruoyi.common.enums.AlgorithmType;
+import com.ruoyi.common.enums.EncodeType;
+import com.ruoyi.common.utils.EncryptUtils;
+import com.ruoyi.common.utils.StringUtils;
+
+/**
+ * RSA算法实现
+ *
+ * @author ruoyi
+ */
+public class RsaEncryptor extends AbstractEncryptor {
+
+    public RsaEncryptor(EncryptContext context) {
+        super(context);
+        String privateKey = context.getPrivateKey();
+        String publicKey = context.getPublicKey();
+        if (StringUtils.isEmpty(privateKey) || StringUtils.isEmpty(publicKey)) {
+            throw new IllegalArgumentException("RSA公私钥均需要提供，公钥加密，私钥解密。");
+        }
+    }
+
+    /**
+     * 获得当前算法
+     */
+    @Override
+    public AlgorithmType algorithm() {
+        return AlgorithmType.RSA;
+    }
+
+    /**
+     * 加密
+     *
+     * @param value      待加密字符串
+     * @param encodeType 加密后的编码格式
+     */
+    @Override
+    public String encrypt(String value, EncodeType encodeType) {
+        if (encodeType == EncodeType.HEX) {
+            return EncryptUtils.encryptByRsaHex(value, context.getPublicKey());
+        } else {
+            return EncryptUtils.encryptByRsa(value, context.getPublicKey());
+        }
+    }
+
+    /**
+     * 解密
+     *
+     * @param value 待解密字符串
+     */
+    @Override
+    public String decrypt(String value) {
+        return EncryptUtils.decryptByRsa(value, context.getPrivateKey());
+    }
+} 

@@ -12,8 +12,22 @@
 // API配置
 let API_CONFIG = {
     // 基础URL，实际部署时请修改为正确的服务器地址
-    BASE_URL: "http://192.168.1.58:8080",
+    BASE_URL: "http://192.168.201.7:8080",
     CLIENT_ID: "f36c69cd4655566bbfac652e479cb931",
+    
+    // 加密配置
+    ENCRYPTION: {
+        // 是否启用加密
+        ENABLED: true,
+        // 加密头部标识
+        HEADER_FLAG: "encrypt-key",
+        // RSA公钥（用于加密AES密钥发送给服务器）
+        // 注意：这是前端加密用的公钥，对应后端配置中的请求解密私钥
+        PUBLIC_KEY: "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKoR8mX0rGKLqzcWmOzbfj64K8ZIgOdHnzkXSOVOZbFu/TJhZ7rFAN+eaGkl3C4buccQd/EjEsj9ir7ijT7h96MCAwEAAQ==",
+        // RSA私钥（用于解密服务器响应）
+        // 注意：这是前端解密用的私钥，对应后端配置中的响应加密公钥
+        PRIVATE_KEY: "MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAmc3CuPiGL/LcIIm7zryCEIbl1SPzBkr75E2VMtxegyZ1lYRD+7TZGAPkvIsBcaMs6Nsy0L78n2qh+lIZMpLH8wIDAQABAkEAk82Mhz0tlv6IVCyIcw/s3f0E+WLmtPFyR9/WtV3Y5aaejUkU60JpX4m5xNR2VaqOLTZAYjW8Wy0aXr3zYIhhQQIhAMfqR9oFdYw1J9SsNc+CrhugAvKTi0+BF6VoL6psWhvbAiEAxPPNTmrkmrXwdm/pQQu3UOQmc2vCZ5tiKpW10CgJi8kCIFGkL6utxw93Ncj4exE/gPLvKcT+1Emnoox+O9kRXss5AiAMtYLJDaLEzPrAWcZeeSgSIzbL+ecokmFKSDDcRske6QIgSMkHedwND1olF8vlKsJUGK3BcdtM8w4Xq7BpSBwsloE="
+    },
     // 租户ID，用于多租户隔离（写死配置，不同的客户端使用不同的租户ID）
     // 重要提示：
     // 1. 每个客户端应该配置唯一的租户ID

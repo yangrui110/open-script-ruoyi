@@ -2,8 +2,13 @@
  * HTTP工具类
  * 基于Java原生实现，不依赖AutoJS的http模块
  * 统一处理认证头部（clientid 和 JWT token）
+ * 支持API加解密功能
  */
 function HttpUtils() {
+    // 导入必要模块
+    var cryptoUtils = require('./crypto-utils.js');
+    var config = require('./config.js');
+    
     // 默认超时时间（毫秒）
     var DEFAULT_TIMEOUT = 30000;
     
@@ -16,6 +21,14 @@ function HttpUtils() {
         tokenStorageKey: "cardToken", // token存储键名
         authStorageName: "auth" // 存储空间名称
     };
+    
+    /**
+     * 获取加密配置
+     * @returns {Object} 加密配置对象
+     */
+    function getEncryptionConfig() {
+        return config.API_CONFIG.ENCRYPTION;
+    }
     
     /**
      * 设置认证配置
@@ -32,6 +45,8 @@ function HttpUtils() {
             authConfig.authStorageName = config.authStorageName;
         }
     }
+    
+
     
     /**
      * 获取认证头部
@@ -107,7 +122,7 @@ function HttpUtils() {
      * 发送不带认证的POST请求（用于登录等场景）
      * @param {string} url 请求URL
      * @param {Object|string} data 请求数据
-     * @param {Object} options 请求选项
+     * @param {Object} options 请求选项，可包含 encrypt: boolean
      * @returns {Object} 响应对象
      */
     function postWithoutAuth(url, data, options) {
@@ -121,13 +136,45 @@ function HttpUtils() {
      * @param {string} method 请求方法
      * @param {string} url 请求URL
      * @param {Object|string} data 请求数据
-     * @param {Object} options 请求选项
+     * @param {Object} options 请求选项，可包含 encrypt: boolean 强制加密选项
      * @returns {Object} 响应对象
      */
     function request(method, url, data, options) {
         options = options || {};
         var result = null;
         var error = null;
+        
+        // 检查是否需要加密 - 直接从配置文件读取
+        var encryptionConfig = getEncryptionConfig();
+        var needEncrypt = encryptionConfig && encryptionConfig.ENABLED && (method === 'POST' || method === 'PUT') && data;
+        console.log('[HttpUtils] 加密检查:', {
+            configExists: !!encryptionConfig,
+            globalEnabled: encryptionConfig ? encryptionConfig.ENABLED : false,
+            method: method,
+            hasData: !!data,
+            needEncrypt: needEncrypt
+        });
+        // 处理请求数据加密
+        var encryptedData = null;
+        var originalData = data;
+        
+        if (needEncrypt) {
+            try {
+                console.log('[HttpUtils] 开始加密请求数据...');
+                var encryptResult = cryptoUtils.encryptRequestData(data, encryptionConfig.PUBLIC_KEY);
+                encryptedData = encryptResult.encryptedData;
+                data = encryptedData; // 替换为加密后的数据
+                
+                // 添加加密头部
+                options.headers = options.headers || {};
+                options.headers[encryptionConfig.HEADER_FLAG] = encryptResult.encryptHeader;
+                
+                console.log('[HttpUtils] 请求数据加密完成，加密头部已设置');
+            } catch (e) {
+                console.error('[HttpUtils] 请求数据加密失败:', e);
+                throw new Error('请求数据加密失败: ' + e.message);
+            }
+        }
         
         // 合并认证头部和自定义头部
         var finalHeaders = mergeHeaders(options.headers, options.skipAuth);
@@ -136,7 +183,13 @@ function HttpUtils() {
         console.log('====== HTTP请求开始 ======');
         console.log('请求方法:', method);
         console.log('请求URL:', url);
-        console.log('请求数据:', data ? (typeof data === 'object' ? JSON.stringify(data, null, 2) : data) : '无');
+        console.log('是否加密:', needEncrypt);
+        if (needEncrypt) {
+            console.log('原始数据:', originalData ? (typeof originalData === 'object' ? JSON.stringify(originalData, null, 2) : originalData) : '无');
+            console.log('加密数据长度:', encryptedData ? encryptedData.length : 0);
+        } else {
+            console.log('请求数据:', data ? (typeof data === 'object' ? JSON.stringify(data, null, 2) : data) : '无');
+        }
         console.log('跳过认证:', !!options.skipAuth);
         console.log('最终请求头:', JSON.stringify(finalHeaders, null, 2));
         console.log('==========================');
@@ -261,6 +314,30 @@ function HttpUtils() {
                         contentLength: connection.getContentLength(),
                         contentType: connection.getContentType()
                     };
+                    
+                    // 处理响应解密
+                    if (needEncrypt && result.statusCode === 200 && !result.isBinary) {
+                        try {
+                            // 检查响应头中是否有加密标识
+                            var responseEncryptionConfig = getEncryptionConfig();
+                            var encryptHeader = headers[responseEncryptionConfig.HEADER_FLAG];
+                            if (encryptHeader && responseEncryptionConfig && responseEncryptionConfig.PRIVATE_KEY) {
+                                console.log('[HttpUtils] 开始解密响应数据...');
+                                var decryptedBody = cryptoUtils.decryptResponseData(
+                                    result.body, 
+                                    encryptHeader, 
+                                    responseEncryptionConfig.PRIVATE_KEY
+                                );
+                                // 将解密后的对象转回JSON字符串，保持与原有逻辑一致
+                                result.body = JSON.stringify(decryptedBody);
+                                console.log('[HttpUtils] 响应数据解密完成');
+                            }
+                        } catch (e) {
+                            console.error('[HttpUtils] 响应数据解密失败:', e);
+                            // 解密失败不抛出异常，使用原始响应体
+                            console.warn('[HttpUtils] 使用原始响应体继续处理');
+                        }
+                    }
                     
                     // 打印响应结果
                     console.log('====== HTTP响应结果 ======');
@@ -507,6 +584,8 @@ function HttpUtils() {
             throw e;
         }
     }
+    
+
     
     return {
         get: get,

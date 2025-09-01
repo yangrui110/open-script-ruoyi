@@ -461,6 +461,7 @@ function Logger() {
                 
                 var response = httpUtils.post(config.server.url, requestData, {
                     timeout: config.server.timeout
+                    // 加密由全局配置控制，不再强制启用
                 });
                 
                 if (response && response.statusCode === 200) {
